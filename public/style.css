@@ -1,0 +1,147 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #0f172a;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 24px 32px;
+  margin: 16px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  text-align: center;
+  color: #64748b;
+}
+
+.precio {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.balance {
+  text-align: center;
+  color: #64748b;
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.lado {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.lado-btn {
+  flex: 1;
+  padding: 16px 8px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 14px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.lado-btn.subir.activo {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #15803d;
+}
+
+.lado-btn.bajar.activo {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+.tamano-label {
+  display: block;
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+input#tamano {
+  width: 100%;
+  font-size: 22px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  margin-bottom: 4px;
+}
+
+.tamano-usd {
+  font-size: 13px;
+  color: #94a3b8;
+  min-height: 18px;
+  margin-bottom: 20px;
+}
+
+.enviar {
+  width: 100%;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 14px;
+  border: none;
+  background: #0f172a;
+  color: white;
+  cursor: pointer;
+}
+
+.enviar:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.resultado {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.resultado.exito {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.resultado.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.posiciones {
+  margin-top: 28px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.posiciones h2 {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 8px;
+}
+
+#posiciones {
+  font-size: 14px;
+  color: #334155;
+}

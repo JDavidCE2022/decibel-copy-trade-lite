@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BTC facil</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="card">
+  <h1>Bitcoin</h1>
+
+  <div class="precio">
+    <span id="precio">cargando...</span>
+  </div>
+
+  <div class="balance">
+    Tienes <strong id="balance">...</strong> disponibles
+  </div>
+
+  <div class="lado">
+    <button id="btn-subir" class="lado-btn subir" type="button">Creo que va a SUBIR</button>
+    <button id="btn-bajar" class="lado-btn bajar" type="button">Creo que va a BAJAR</button>
+  </div>
+
+  <label class="tamano-label" for="tamano">¿Cuánto BTC quieres apostar?</label>
+  <input id="tamano" type="number" min="0" step="0.001" placeholder="0.001" />
+  <div id="tamano-usd" class="tamano-usd"></div>
+
+  <button id="btn-enviar" class="enviar" type="button" disabled>Elige subir o bajar primero</button>
+
+  <div id="resultado" class="resultado" hidden></div>
+
+  <section class="posiciones">
+    <h2>Tus posiciones abiertas</h2>
+    <div id="posiciones">ninguna</div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
