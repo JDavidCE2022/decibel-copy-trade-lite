@@ -3,3 +3,8 @@ dist/
 .env
 *.log
 data/
+
+# Personal reference material — not part of the deliverable.
+decibel_engineering_test.pdf
+decibel_engineering_test_es.pdf
+image.png
