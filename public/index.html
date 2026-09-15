@@ -38,6 +38,34 @@
   </section>
 </main>
 
+<main class="card">
+  <h1>Publicar una señal</h1>
+  <p class="subtitulo">Comparte una idea de trade para que otros la copien con un clic.</p>
+
+  <div class="lado">
+    <button id="senal-btn-subir" class="lado-btn subir" type="button">Long (creo que sube)</button>
+    <button id="senal-btn-bajar" class="lado-btn bajar" type="button">Short (creo que baja)</button>
+  </div>
+
+  <label class="tamano-label" for="senal-tp">Take profit (% arriba de la entrada)</label>
+  <input id="senal-tp" type="number" min="0" step="0.1" placeholder="3" />
+
+  <label class="tamano-label" for="senal-sl">Stop loss (% abajo de la entrada)</label>
+  <input id="senal-sl" type="number" min="0" step="0.1" placeholder="2" />
+
+  <label class="tamano-label" for="senal-horas">¿Cuántas horas la vas a dejar abierta?</label>
+  <input id="senal-horas" type="number" min="0" step="1" placeholder="4" />
+
+  <button id="senal-btn-publicar" class="enviar" type="button" disabled>Elige Long o Short primero</button>
+
+  <div id="senal-resultado" class="resultado" hidden></div>
+</main>
+
+<main class="card">
+  <h1>Historial de señales</h1>
+  <div id="lista-senales">Cargando...</div>
+</main>
+
 <script src="app.js"></script>
 </body>
 </html>
