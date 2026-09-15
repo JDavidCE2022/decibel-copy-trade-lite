@@ -69,7 +69,20 @@ async function cargarDashboard() {
     if (json.data.positions.length === 0) {
       elPosiciones.textContent = "ninguna";
     } else {
-      elPosiciones.textContent = JSON.stringify(json.data.positions);
+      elPosiciones.innerHTML = json.data.positions
+        .map((p) => {
+          const esLong = p.size >= 0;
+          const claseLado = esLong ? "side-long" : "side-short";
+          const textoLado = esLong ? "LONG" : "SHORT";
+          return `
+            <div class="senal-item">
+              <div class="fila"><span class="${claseLado}">${textoLado} BTC</span><span>${Math.abs(p.size)} BTC</span></div>
+              <div class="fila"><span>Entrada</span><span>${formatoUsd(p.entry_price)}</span></div>
+              <div class="fila"><span>Apalancamiento</span><span>${p.user_leverage}x</span></div>
+            </div>
+          `;
+        })
+        .join("");
     }
 
     actualizarTamanoUsd();

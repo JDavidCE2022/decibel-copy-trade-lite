@@ -17,6 +17,11 @@ export type OrderResult =
  * trade ocurrió de verdad — un rechazo por margen insuficiente también
  * devuelve success:true pero sin orderId (ver Capítulo 7 de la guía). Por
  * eso esta función normaliza ambos casos como fallo con un mensaje claro.
+ *
+ * Además, Decibel empareja órdenes de forma asíncrona: el evento de la
+ * propia transacción solo confirma que la orden fue ACEPTADA
+ * (status ACKNOWLEDGED), no que ya se llenó — el emparejamiento real ocurre
+ * un poco después, procesado por la red en segundo plano.
  */
 export async function placeMarketOrder(params: {
   marketName: string;
@@ -56,7 +61,16 @@ export async function placeMarketOrder(params: {
     // Ya estaba configurada — seguimos.
   }
 
-  const price = aUnidadesDeCadena(priceData.mark_px, market.px_decimals);
+  // Esto es una IOC (immediate-or-cancel), no una orden de mercado real: solo
+  // se llena si cruza el libro de órdenes en el momento del envío. Si
+  // pusiéramos el precio exacto del mark_px, el libro pudo haberse movido
+  // desde la última lectura y la orden se cancelaría sin llenarse (0 fill),
+  // indistinguible de un rechazo por margen. Este colchón del 1% garantiza
+  // que cruce como una compra/venta agresiva de verdad.
+  const SLIPPAGE = 0.01;
+  const precioConColchon = isBuy ? priceData.mark_px * (1 + SLIPPAGE) : priceData.mark_px * (1 - SLIPPAGE);
+
+  const price = aUnidadesDeCadena(precioConColchon, market.px_decimals);
   const size = aUnidadesDeCadena(sizeHuman, market.sz_decimals);
 
   try {
@@ -70,6 +84,10 @@ export async function placeMarketOrder(params: {
       tickSize: market.tick_size,
       builderAddr,
       builderFee: builderFeeBps,
+      // Sin esto, el SDK busca el order_id comparando contra la dirección de
+      // la wallet en vez de la subcuenta, y nunca lo encuentra aunque sí
+      // exista en el evento on-chain (bug real encontrado probando en vivo).
+      subaccountAddr,
     });
 
     if (!result.success) {
