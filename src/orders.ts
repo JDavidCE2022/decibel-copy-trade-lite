@@ -10,18 +10,19 @@ export type OrderResult =
   | { ok: false; reason: string };
 
 /**
- * Coloca una orden "a mercado" (en realidad una IOC agresiva al precio en
- * vivo, que es como se simula un market order en un libro de órdenes).
+ * Places a "market" order (really an aggressive IOC at the live price,
+ * which is how a market order is simulated on an order book).
  *
- * IMPORTANTE: result.success === true del SDK no basta para saber si el
- * trade ocurrió de verdad — un rechazo por margen insuficiente también
- * devuelve success:true pero sin orderId (ver Capítulo 7 de la guía). Por
- * eso esta función normaliza ambos casos como fallo con un mensaje claro.
+ * IMPORTANT: result.success === true from the SDK isn't enough to know the
+ * trade actually happened — a rejection for insufficient margin also
+ * returns success:true but with no orderId (see Chapter 7 of the guide).
+ * That's why this function normalizes both cases as a failure with a
+ * clear message.
  *
- * Además, Decibel empareja órdenes de forma asíncrona: el evento de la
- * propia transacción solo confirma que la orden fue ACEPTADA
- * (status ACKNOWLEDGED), no que ya se llenó — el emparejamiento real ocurre
- * un poco después, procesado por la red en segundo plano.
+ * Also, Decibel matches orders asynchronously: the transaction's own event
+ * only confirms the order was ACCEPTED (status ACKNOWLEDGED), not that it
+ * was already filled — the actual matching happens a bit later, processed
+ * by the network in the background.
  */
 export async function placeMarketOrder(params: {
   marketName: string;
@@ -47,9 +48,9 @@ export async function placeMarketOrder(params: {
     return { ok: false, reason: "No se pudo leer el precio en vivo" };
   }
 
-  // Asegura que la subcuenta esté configurada para este mercado. Es
-  // necesaria antes de la primera orden en cada mercado; en las siguientes
-  // veces el contrato la rechaza porque ya existe — no es un error real.
+  // Makes sure the subaccount is configured for this market. It's needed
+  // before the first order in each market; on later calls the contract
+  // rejects it because it already exists — that's not a real error.
   try {
     await write.configureUserSettingsForMarket({
       marketAddr: market.market_addr,
@@ -58,15 +59,15 @@ export async function placeMarketOrder(params: {
       userLeverage: 5,
     });
   } catch {
-    // Ya estaba configurada — seguimos.
+    // Already configured — carry on.
   }
 
-  // Esto es una IOC (immediate-or-cancel), no una orden de mercado real: solo
-  // se llena si cruza el libro de órdenes en el momento del envío. Si
-  // pusiéramos el precio exacto del mark_px, el libro pudo haberse movido
-  // desde la última lectura y la orden se cancelaría sin llenarse (0 fill),
-  // indistinguible de un rechazo por margen. Este colchón del 1% garantiza
-  // que cruce como una compra/venta agresiva de verdad.
+  // This is an IOC (immediate-or-cancel), not a real market order: it only
+  // fills if it crosses the order book at the moment it's sent. If we used
+  // the exact mark_px, the book could have moved since the last read and
+  // the order would cancel with zero fill — indistinguishable from a
+  // margin rejection. This 1% buffer guarantees it crosses like a real
+  // aggressive buy/sell.
   const SLIPPAGE = 0.01;
   const precioConColchon = isBuy ? priceData.mark_px * (1 + SLIPPAGE) : priceData.mark_px * (1 - SLIPPAGE);
 
@@ -84,9 +85,10 @@ export async function placeMarketOrder(params: {
       tickSize: market.tick_size,
       builderAddr,
       builderFee: builderFeeBps,
-      // Sin esto, el SDK busca el order_id comparando contra la dirección de
-      // la wallet en vez de la subcuenta, y nunca lo encuentra aunque sí
-      // exista en el evento on-chain (bug real encontrado probando en vivo).
+      // Without this, the SDK looks for the order_id by comparing against
+      // the wallet address instead of the subaccount, and never finds it
+      // even when it does exist in the on-chain event (a real bug found
+      // by testing live).
       subaccountAddr,
     });
 

@@ -19,8 +19,8 @@ export const write = new DecibelWriteDex(TESTNET_CONFIG, account, {
   skipSimulate: true,
 });
 
-// La dirección con la que en verdad se opera (distinta de la wallet, ver
-// Capítulo 5/6 de la guía). Es una derivación pura, no necesita red.
+// The address that actually trades (different from the wallet, see
+// Chapter 5/6 of the guide). It's a pure derivation, no network needed.
 export const subaccountAddr = getPrimarySubaccountAddr(
   account.accountAddress,
   TESTNET_CONFIG.compatVersion,

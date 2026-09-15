@@ -36,7 +36,7 @@ async function guardarTodas(signals: Signal[]): Promise<void> {
 export type CrearSenalInput = {
   market: string;
   side: "buy" | "sell";
-  tpPct: number; // como fracción: 0.03 = 3%
+  tpPct: number; // as a fraction: 0.03 = 3%
   slPct: number;
   holdMinutes: number;
 };
@@ -44,9 +44,9 @@ export type CrearSenalInput = {
 export type CrearSenalResult = { ok: true; signal: Signal } | { ok: false; reason: string };
 
 /**
- * Crea y persiste una señal. El precio de entrada SIEMPRE se lee en vivo del
- * SDK aquí en el servidor (nunca se confía en un precio que mande el
- * navegador) — así nadie puede inventar una entrada favorable.
+ * Creates and persists a signal. The entry price is ALWAYS read live from
+ * the SDK here on the server (never trusting a price sent by the browser)
+ * — that way nobody can make up a favorable entry.
  */
 export async function crearSenal(input: CrearSenalInput): Promise<CrearSenalResult> {
   const { market, side, tpPct, slPct, holdMinutes } = input;
@@ -70,7 +70,7 @@ export async function crearSenal(input: CrearSenalInput): Promise<CrearSenalResu
   }
   const entryPrice = priceRow.mark_px;
 
-  // Long: TP arriba de la entrada, SL abajo. Short: exactamente al revés.
+  // Long: TP above the entry, SL below. Short: exactly the opposite.
   const tpPrice = side === "buy" ? entryPrice * (1 + tpPct) : entryPrice * (1 - tpPct);
   const slPrice = side === "buy" ? entryPrice * (1 - slPct) : entryPrice * (1 + slPct);
 
@@ -90,7 +90,7 @@ export async function crearSenal(input: CrearSenalInput): Promise<CrearSenalResu
   };
 
   const todas = await leerTodas();
-  todas.unshift(signal); // la más reciente primero
+  todas.unshift(signal); // most recent first
   await guardarTodas(todas);
 
   return { ok: true, signal };
@@ -106,8 +106,8 @@ export async function obtenerSenal(id: string): Promise<Signal | null> {
 }
 
 /**
- * Precio histórico para dibujar el gráfico de una señal: desde que se
- * publicó hasta ahora (o hasta que venció, lo que ocurra primero).
+ * Historical price to draw a signal's chart: from when it was published
+ * until now (or until it expired, whichever comes first).
  */
 export async function obtenerVelasParaSenal(id: string) {
   const signal = await obtenerSenal(id);
@@ -117,7 +117,7 @@ export async function obtenerVelasParaSenal(id: string) {
   const endTime = Math.min(Date.now(), new Date(signal.expiresAt).getTime());
 
   if (endTime <= startTime) {
-    // Señal recién publicada — todavía no hay ni un minuto de historia.
+    // Signal just published — there isn't even a minute of history yet.
     return { signal, candles: [] as Awaited<ReturnType<typeof read.candlesticks.getByName>> };
   }
 

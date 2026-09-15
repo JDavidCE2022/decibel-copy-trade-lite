@@ -126,7 +126,7 @@ elBtnEnviar.addEventListener("click", async () => {
 cargarDashboard();
 setInterval(cargarDashboard, 3000);
 
-// --- Publicar una señal ---
+// --- Publish a signal ---
 
 let senalLado = null; // "buy" | "sell"
 
@@ -246,7 +246,7 @@ async function cargarSenales() {
 
 cargarSenales();
 
-// --- Gráfico de una señal (precio + entrada/TP/SL) ---
+// --- Chart for a signal (price + entry/TP/SL) ---
 
 function construirSvgGrafico(signal, candles) {
   const ancho = 560;
@@ -330,9 +330,9 @@ elListaSenales.addEventListener("click", async (evento) => {
   }
 });
 
-// --- Copiar una señal con un clic ---
-// Reutiliza la misma ruta /api/order que usa el botón manual de arriba —
-// es literalmente el mismo trade, solo que precargado desde la señal.
+// --- Copy a signal with one click ---
+// Reuses the same /api/order route as the manual button above — it's
+// literally the same trade, just pre-filled from the signal.
 elListaSenales.addEventListener("click", async (evento) => {
   const boton = evento.target.closest(".copiar-btn");
   if (!boton) return;

@@ -5,17 +5,17 @@ import { crearSenal, listarSenales, obtenerVelasParaSenal } from "./signals.js";
 import { subaccountAddr } from "./decibel.js";
 
 const MARKET = "BTC/USD";
-// En este proyecto tú eres tanto el trader como el "builder" (ver Capítulo 3
-// de la guía) — por eso cada orden, sea manual o copiada, lleva tu propia
-// subcuenta como builderAddr. Así el flujo de builder codes del requisito
-// OBLIGATORIO #2 aplica siempre, no solo en una prueba aislada.
+// In this project you're both the trader and the "builder" (see Chapter 3
+// of the guide) — that's why every order, manual or copied, carries your
+// own subaccount as builderAddr. That way the builder-code flow from
+// MUST-HAVE requirement #2 always applies, not just in an isolated test.
 const BUILDER_FEE_BPS = 10;
 
 const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-// Solo lectura: alimenta la pantalla (precio, balance, posiciones, órdenes).
+// Read-only: feeds the screen (price, balance, positions, orders).
 app.get("/api/dashboard", async (_req, res) => {
   try {
     const data = await getDashboard(MARKET);
@@ -25,7 +25,7 @@ app.get("/api/dashboard", async (_req, res) => {
   }
 });
 
-// El único botón "grande" del enunciado: comprar o vender un tamaño.
+// The one "big button" from the brief: buy or sell a size.
 app.post("/api/order", async (req, res) => {
   const { side, size } = req.body ?? {};
 
@@ -54,14 +54,14 @@ app.post("/api/order", async (req, res) => {
   }
 });
 
-// Historial de señales: crear una nueva, y listarlas todas.
+// Signal history: create a new one, and list them all.
 app.post("/api/signals", async (req, res) => {
   const { side, tpPct, slPct, holdHours } = req.body ?? {};
   try {
     const result = await crearSenal({
       market: MARKET,
       side,
-      tpPct: Number(tpPct) / 100, // el usuario escribe "3", no "0.03"
+      tpPct: Number(tpPct) / 100, // the user types "3", not "0.03"
       slPct: Number(slPct) / 100,
       holdMinutes: Number(holdHours) * 60,
     });
@@ -84,7 +84,7 @@ app.get("/api/signals", async (_req, res) => {
   }
 });
 
-// Precio histórico + entrada/TP/SL de una señal, para dibujar su gráfico.
+// Historical price + a signal's entry/TP/SL, to draw its chart.
 app.get("/api/signals/:id/candles", async (req, res) => {
   try {
     const data = await obtenerVelasParaSenal(req.params.id);

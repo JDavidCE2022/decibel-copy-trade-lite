@@ -12,7 +12,7 @@ export async function getDashboard(marketName: string) {
     const overview = await read.accountOverview.getByAddr({ subAddr: subaccountAddr });
     balance = overview.perp_equity_balance;
   } catch (err) {
-    // Una subcuenta sin depósitos no tiene overview todavía — eso es "$0", no un error.
+    // A subaccount with no deposits doesn't have an overview yet — that's "$0", not an error.
     if (!(err instanceof Error && err.message.includes("404"))) {
       throw err;
     }
