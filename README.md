@@ -44,7 +44,7 @@ SDK connection independently of the web UI.
 
 **MUST**
 - [x] Connect to Decibel on Aptos testnet, authenticate a wallet from an env var
-- [x] Two-step builder-code flow (`approveMaxBuilderFee` → `placeOrder`), verified live on testnet
+- [x] Two-step builder-code flow (`approveMaxBuilderFee` → `placeOrder`), verified live on testnet with a real filled order
 - [x] Kid-friendly trade screen: pick BTC, Buy/Sell, size, one big button
 - [x] Live-ish account state (balance, positions, open orders) via polling
 
@@ -54,42 +54,50 @@ SDK connection independently of the web UI.
 - [x] One-click copy — reuses the exact same order-placement code path as the manual trade screen
 - [x] Persistent signal history (JSON file), listed newest-first
 
-**STRETCH** — not attempted (out of scope for the time box; see "What's next").
+**STRETCH** — not attempted (out of scope for the time box; see "What I'd do with another day").
 
-## Known limitation: no live testnet collateral
+## Testnet collateral
 
-Decibel's public testnet phase concluded in early 2026 (mainnet launched
-February 26, 2026). By the time this was built, there was no documented,
-self-service way to obtain testnet USDC/collateral:
+Decibel's public testnet phase had appeared to conclude in early 2026
+(mainnet launched February 26, 2026), and `app.decibel.trade` only serves
+mainnet now — its "Enable Trading" flow prompts a **mainnet** signature,
+which was correctly never approved, per the testnet-only rule for this repo.
+No faucet/mint path was documented anywhere in the SDK, CLI, or the ~170-page
+docs index.
 
-- `app.decibel.trade` only supports mainnet now (confirmed directly: its
-  "Enable Trading" flow prompts a **mainnet** signature in the wallet — never
-  approved, per the testnet-only rule).
-- The SDK's own `admin.mintUsdc` is admin-gated; the public "restricted mint"
-  quota system referenced by `mintsRemaining`/`availableRestrictedMintFor` has
-  no exposed write method in the current SDK/CLI/docs.
-- Searched the full docs index (`docs.decibel.trade/llms.txt`, ~170 pages),
-  the SDK source, and the CLI reference for a faucet/mint path — none exists.
+A Decibel team member pointed me to the actual testnet frontend,
+`testnet-app.decibel.trade`, which does have a "Mint USDC" faucet button.
+Once minted, the exact same account and code in this repo placed and
+**filled** a real order end-to-end — no code changes were needed for
+that part, only the missing piece of information about where testnet lived.
 
-**What this means in practice:** the account has real APT (gas) but $0
-collateral. Every write call in this repo (`approveMaxBuilderFee`,
-`configureUserSettingsForMarket`, `placeOrder`) is verified to execute
-successfully on-chain — the two-step builder-code flow works end to end. The
-one thing not demonstrated live is an order that actually **fills**, since
-that needs USDC to margin the position.
+## Real bugs this collateral unlocked (found and fixed)
 
-I reached out to Decibel (Discord) asking for testnet funds for this
-evaluation; if that resolves before review, the exact same code path places a
-real, filled order with no changes needed.
+Two real bugs only surfaced once there was collateral to actually fill an
+order against — before that, every failed order looked identical whether the
+cause was missing funds or something else:
 
-## A subtle bug this uncovered (and fixed)
+- **`write.placeOrder` needs `subaccountAddr` passed explicitly.** The SDK
+  extracts the filled order's `orderId` by matching the on-chain event's
+  `user` field against `subaccountAddr ?? account.accountAddress`. Without
+  passing it, the SDK compared against the wallet address instead of the
+  subaccount address that actually appears in the event — so a real,
+  successful fill was silently reported as "order didn't execute (probably
+  insufficient funds)", even though the trade had gone through.
+- **Decibel matches orders asynchronously.** The `placeOrder` transaction's
+  own event only ever shows `status: ACKNOWLEDGED` — the order was accepted
+  into the network's async matching engine, not that it filled. The actual
+  match happens a little later, processed by the network in the background
+  (confirmed by reading the raw on-chain transaction and watching the
+  position update a few seconds after submission).
 
-Without collateral, `placeOrder` on a resting (GTC) order returns
+Separately, without collateral, `placeOrder` on a resting (GTC) order returns
 `{ success: true, orderId: undefined }` — the on-chain contract silently
 discards an order it can't margin, without aborting the transaction. A naive
-implementation would report "trade placed!" when nothing happened. `src/orders.ts`
-treats a missing `orderId` as a failure with a clear reason, specifically to
-avoid this silent-success trap (see the "unhappy path" safety rule below).
+implementation would report "trade placed!" when nothing happened.
+`src/orders.ts` treats a missing `orderId` as a failure with a clear reason,
+specifically to avoid this silent-success trap (see the "unhappy path"
+safety rule below).
 
 ## Architecture
 
@@ -130,6 +138,10 @@ not by reading docs:
    permissions (this was initially misdiagnosed as a builder-registration
    gate before being traced to missing initialization order).
 6. **The silent order-rejection behavior** described above.
+7. **`placeOrder` silently fails to report a real fill without `subaccountAddr`**
+   — see "Real bugs this collateral unlocked" above.
+8. **Decibel's async order matching** — a `placeOrder` transaction's own
+   event confirms acceptance, not a fill; see above.
 
 ## Biggest safety risk in this submission
 
@@ -141,8 +153,6 @@ write client, and every write call is wrapped so a failure returns a typed
 
 ## What I'd do with another day
 
-- Resolve the collateral situation and record a real filled trade + a real
-  copied trade.
 - WebSocket subscriptions (`marketPrices.subscribeByName`, etc.) instead of
   polling.
 - Mark signal outcome (hit TP / hit SL / expired) by polling fills after
@@ -159,6 +169,6 @@ the reasoning behind each choice before moving on. Each piece was run for
 real against Decibel testnet and verified before proceeding — the bug list
 above is the direct result of that verification loop, not guesswork. I
 directed scope and ordering, made the product/security judgment calls (e.g.
-what counts as an acceptable fallback when testnet collateral turned out to
-be unavailable, English vs. Spanish for this README), and tested every
-feature myself in the browser before considering it done.
+what counts as an acceptable fallback while testnet collateral was hard to
+find, English vs. Spanish for this README), and tested every feature myself
+in the browser before considering it done.
