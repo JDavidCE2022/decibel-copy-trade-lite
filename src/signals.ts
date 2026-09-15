@@ -52,21 +52,21 @@ export async function crearSenal(input: CrearSenalInput): Promise<CrearSenalResu
   const { market, side, tpPct, slPct, holdMinutes } = input;
 
   if (side !== "buy" && side !== "sell") {
-    return { ok: false, reason: "El lado debe ser Long o Short" };
+    return { ok: false, reason: "Side must be Long or Short" };
   }
   if (!Number.isFinite(tpPct) || tpPct <= 0) {
-    return { ok: false, reason: "El take profit debe ser un porcentaje mayor que 0" };
+    return { ok: false, reason: "Take profit must be a percentage greater than 0" };
   }
   if (!Number.isFinite(slPct) || slPct <= 0) {
-    return { ok: false, reason: "El stop loss debe ser un porcentaje mayor que 0" };
+    return { ok: false, reason: "Stop loss must be a percentage greater than 0" };
   }
   if (!Number.isFinite(holdMinutes) || holdMinutes <= 0) {
-    return { ok: false, reason: "La duración debe ser mayor que 0" };
+    return { ok: false, reason: "Duration must be greater than 0" };
   }
 
   const [priceRow] = await read.marketPrices.getByName({ marketName: market });
   if (!priceRow) {
-    return { ok: false, reason: `No se pudo leer el precio en vivo de ${market}` };
+    return { ok: false, reason: `Couldn't read the live price for ${market}` };
   }
   const entryPrice = priceRow.mark_px;
 

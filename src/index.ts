@@ -1,7 +1,7 @@
 import { read, subaccountAddr } from "./decibel.js";
 
 const markets = await read.markets.getAll();
-console.log(`Mercados perpetuos disponibles (${markets.length}):`);
+console.log(`Available perpetual markets (${markets.length}):`);
 for (const m of markets) {
   console.log(`  - ${m.market_name}`);
 }
@@ -9,12 +9,12 @@ for (const m of markets) {
 const btc = markets.find((m) => m.market_name.includes("BTC"));
 if (btc) {
   const prices = await read.marketPrices.getByName({ marketName: btc.market_name });
-  console.log(`\nPrecio en vivo de ${btc.market_name}:`, prices[0]);
+  console.log(`\nLive price for ${btc.market_name}:`, prices[0]);
 } else {
-  console.log("\nNo se encontró un mercado de BTC en la lista de arriba.");
+  console.log("\nNo BTC market found in the list above.");
 }
 
-console.log("\nTu subcuenta:", subaccountAddr);
+console.log("\nYour subaccount:", subaccountAddr);
 
 try {
   const overview = await read.accountOverview.getByAddr({ subAddr: subaccountAddr });
@@ -22,14 +22,14 @@ try {
 } catch (err) {
   // A subaccount with no deposits doesn't have an overview yet — that's "$0", not an error.
   if (err instanceof Error && err.message.includes("404")) {
-    console.log("Balance/equity: $0 (sin depósitos todavía)");
+    console.log("Balance/equity: $0 (no deposits yet)");
   } else {
-    console.log("No se pudo leer el balance:", (err as Error).message);
+    console.log("Couldn't read the balance:", (err as Error).message);
   }
 }
 
 const positions = await read.userPositions.getByAddr({ subAddr: subaccountAddr, includeDeleted: false, limit: 10 });
-console.log("Posiciones abiertas:", positions.length === 0 ? "ninguna" : positions);
+console.log("Open positions:", positions.length === 0 ? "none" : positions);
 
 const openOrders = await read.userOpenOrders.getByAddr({ subAddr: subaccountAddr });
-console.log("Órdenes abiertas:", openOrders.total_count === 0 ? "ninguna" : openOrders.items);
+console.log("Open orders:", openOrders.total_count === 0 ? "none" : openOrders.items);

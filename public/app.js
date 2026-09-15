@@ -12,13 +12,13 @@ const elResultado = document.getElementById("resultado");
 const elPosiciones = document.getElementById("posiciones");
 
 function formatoUsd(numero) {
-  return numero.toLocaleString("es-MX", { style: "currency", currency: "USD" });
+  return numero.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
 
 function actualizarTamanoUsd() {
   const tamano = Number(elTamano.value);
   if (precioActual && tamano > 0) {
-    elTamanoUsd.textContent = `= aprox. ${formatoUsd(tamano * precioActual)}`;
+    elTamanoUsd.textContent = `= approx. ${formatoUsd(tamano * precioActual)}`;
   } else {
     elTamanoUsd.textContent = "";
   }
@@ -29,11 +29,11 @@ function actualizarBotonEnviar() {
   const listo = lado !== null && tamano > 0;
   elBtnEnviar.disabled = !listo;
   if (!lado) {
-    elBtnEnviar.textContent = "Elige subir o bajar primero";
+    elBtnEnviar.textContent = "Choose up or down first";
   } else if (!(tamano > 0)) {
-    elBtnEnviar.textContent = "Escribe cuánto quieres apostar";
+    elBtnEnviar.textContent = "Enter how much you want to bet";
   } else {
-    elBtnEnviar.textContent = lado === "buy" ? `Apostar a que SUBE` : `Apostar a que BAJA`;
+    elBtnEnviar.textContent = lado === "buy" ? `Bet it goes UP` : `Bet it goes DOWN`;
   }
 }
 
@@ -63,11 +63,11 @@ async function cargarDashboard() {
     if (!json.ok) throw new Error(json.reason);
 
     precioActual = json.data.price;
-    elPrecio.textContent = precioActual ? formatoUsd(precioActual) : "sin datos";
+    elPrecio.textContent = precioActual ? formatoUsd(precioActual) : "no data";
     elBalance.textContent = formatoUsd(json.data.balance ?? 0);
 
     if (json.data.positions.length === 0) {
-      elPosiciones.textContent = "ninguna";
+      elPosiciones.textContent = "none";
     } else {
       elPosiciones.innerHTML = json.data.positions
         .map((p) => {
@@ -77,8 +77,8 @@ async function cargarDashboard() {
           return `
             <div class="senal-item">
               <div class="fila"><span class="${claseLado}">${textoLado} BTC</span><span>${Math.abs(p.size)} BTC</span></div>
-              <div class="fila"><span>Entrada</span><span>${formatoUsd(p.entry_price)}</span></div>
-              <div class="fila"><span>Apalancamiento</span><span>${p.user_leverage}x</span></div>
+              <div class="fila"><span>Entry</span><span>${formatoUsd(p.entry_price)}</span></div>
+              <div class="fila"><span>Leverage</span><span>${p.user_leverage}x</span></div>
             </div>
           `;
         })
@@ -87,8 +87,8 @@ async function cargarDashboard() {
 
     actualizarTamanoUsd();
   } catch (err) {
-    elPrecio.textContent = "sin conexión";
-    console.error("Error cargando el dashboard:", err);
+    elPrecio.textContent = "no connection";
+    console.error("Error loading dashboard:", err);
   }
 }
 
@@ -108,15 +108,15 @@ elBtnEnviar.addEventListener("click", async () => {
     elResultado.hidden = false;
     if (json.ok) {
       elResultado.className = "resultado exito";
-      elResultado.textContent = `Listo. Orden confirmada (id ${json.orderId}).`;
+      elResultado.textContent = `Done. Order confirmed (id ${json.orderId}).`;
     } else {
       elResultado.className = "resultado error";
-      elResultado.textContent = `No se pudo completar: ${json.reason}`;
+      elResultado.textContent = `Couldn't complete it: ${json.reason}`;
     }
   } catch (err) {
     elResultado.hidden = false;
     elResultado.className = "resultado error";
-    elResultado.textContent = "No se pudo conectar con el servidor. Intenta de nuevo.";
+    elResultado.textContent = "Couldn't connect to the server. Try again.";
   } finally {
     actualizarBotonEnviar();
     cargarDashboard();
@@ -145,7 +145,7 @@ function actualizarBotonPublicar() {
   const horas = Number(elSenalHoras.value);
   const listo = senalLado !== null && tp > 0 && sl > 0 && horas > 0;
   elSenalBtnPublicar.disabled = !listo;
-  elSenalBtnPublicar.textContent = senalLado === null ? "Elige Long o Short primero" : "Publicar señal";
+  elSenalBtnPublicar.textContent = senalLado === null ? "Choose Long or Short first" : "Publish signal";
 }
 
 elSenalBtnSubir.addEventListener("click", () => {
@@ -184,26 +184,26 @@ elSenalBtnPublicar.addEventListener("click", async () => {
     elSenalResultado.hidden = false;
     if (json.ok) {
       elSenalResultado.className = "resultado exito";
-      elSenalResultado.textContent = "Señal publicada.";
+      elSenalResultado.textContent = "Signal published.";
       elSenalTp.value = "";
       elSenalSl.value = "";
       elSenalHoras.value = "";
       cargarSenales();
     } else {
       elSenalResultado.className = "resultado error";
-      elSenalResultado.textContent = `No se pudo publicar: ${json.reason}`;
+      elSenalResultado.textContent = `Couldn't publish it: ${json.reason}`;
     }
   } catch (err) {
     elSenalResultado.hidden = false;
     elSenalResultado.className = "resultado error";
-    elSenalResultado.textContent = "No se pudo conectar con el servidor.";
+    elSenalResultado.textContent = "Couldn't connect to the server.";
   } finally {
     actualizarBotonPublicar();
   }
 });
 
 function formatoFecha(iso) {
-  return new Date(iso).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" });
+  return new Date(iso).toLocaleString("en-US", { dateStyle: "short", timeStyle: "short" });
 }
 
 async function cargarSenales() {
@@ -213,7 +213,7 @@ async function cargarSenales() {
     if (!json.ok) throw new Error(json.reason);
 
     if (json.signals.length === 0) {
-      elListaSenales.textContent = "Todavía no hay señales publicadas.";
+      elListaSenales.textContent = "No signals published yet.";
       return;
     }
 
@@ -224,22 +224,22 @@ async function cargarSenales() {
         return `
           <div class="senal-item" data-id="${s.id}">
             <div class="fila"><span class="${claseLado}">${textoLado} ${s.market}</span><span>${formatoFecha(s.createdAt)}</span></div>
-            <div class="fila"><span>Entrada</span><span>${formatoUsd(s.entryPrice)}</span></div>
+            <div class="fila"><span>Entry</span><span>${formatoUsd(s.entryPrice)}</span></div>
             <div class="fila"><span>Take profit (+${(s.tpPct * 100).toFixed(1)}%)</span><span>${formatoUsd(s.tpPrice)}</span></div>
             <div class="fila"><span>Stop loss (-${(s.slPct * 100).toFixed(1)}%)</span><span>${formatoUsd(s.slPrice)}</span></div>
-            <div class="fila"><span>Duración</span><span>${(s.holdMinutes / 60).toFixed(1)} h</span></div>
-            <button class="grafico-btn" type="button">Ver gráfico</button>
+            <div class="fila"><span>Duration</span><span>${(s.holdMinutes / 60).toFixed(1)} h</span></div>
+            <button class="grafico-btn" type="button">View chart</button>
             <div class="grafico-container" hidden></div>
-            <label class="tamano-label" style="margin-top:8px">¿Cuánto BTC quieres copiar?</label>
+            <label class="tamano-label" style="margin-top:8px">How much BTC do you want to copy?</label>
             <input type="number" class="copiar-tamano" min="0" step="0.001" value="0.001" />
-            <button class="copiar-btn" type="button" data-side="${s.side}">Copiar esta señal</button>
+            <button class="copiar-btn" type="button" data-side="${s.side}">Copy this signal</button>
             <div class="copiar-resultado resultado" hidden></div>
           </div>
         `;
       })
       .join("");
   } catch (err) {
-    elListaSenales.textContent = "No se pudo cargar el historial.";
+    elListaSenales.textContent = "Couldn't load the history.";
     console.error(err);
   }
 }
@@ -290,7 +290,7 @@ function construirSvgGrafico(signal, candles) {
   return `
     <svg viewBox="0 0 ${ancho} ${alto}" width="100%" height="180" style="background:#f8fafc;border-radius:10px;display:block">
       ${lineaNivel(signal.tpPrice, "#16a34a", "5,3", `TP ${Math.round(signal.tpPrice).toLocaleString()}`)}
-      ${lineaNivel(signal.entryPrice, "#64748b", "2,3", `Entrada ${Math.round(signal.entryPrice).toLocaleString()}`)}
+      ${lineaNivel(signal.entryPrice, "#64748b", "2,3", `Entry ${Math.round(signal.entryPrice).toLocaleString()}`)}
       ${lineaNivel(signal.slPrice, "#dc2626", "5,3", `SL ${Math.round(signal.slPrice).toLocaleString()}`)}
       ${polilinea ? `<polyline points="${polilinea}" fill="none" stroke="#0f172a" stroke-width="2" />` : ""}
     </svg>
@@ -311,7 +311,7 @@ elListaSenales.addEventListener("click", async (evento) => {
   }
 
   contenedor.hidden = false;
-  contenedor.textContent = "Cargando gráfico...";
+  contenedor.textContent = "Loading chart...";
 
   try {
     const res = await fetch(`/api/signals/${idSenal}/candles`);
@@ -319,13 +319,13 @@ elListaSenales.addEventListener("click", async (evento) => {
     if (!json.ok) throw new Error(json.reason);
 
     if (json.candles.length === 0) {
-      contenedor.textContent = "Esta señal es muy reciente todavía — vuelve en unos minutos para ver el gráfico.";
+      contenedor.textContent = "This signal is still too recent — check back in a few minutes to see the chart.";
       return;
     }
 
     contenedor.innerHTML = construirSvgGrafico(json.signal, json.candles);
   } catch (err) {
-    contenedor.textContent = "No se pudo cargar el gráfico.";
+    contenedor.textContent = "Couldn't load the chart.";
     console.error(err);
   }
 });
@@ -357,15 +357,15 @@ elListaSenales.addEventListener("click", async (evento) => {
     elResultadoCopia.hidden = false;
     if (json.ok) {
       elResultadoCopia.className = "copiar-resultado resultado exito";
-      elResultadoCopia.textContent = `Copiado. Orden confirmada (id ${json.orderId}).`;
+      elResultadoCopia.textContent = `Copied. Order confirmed (id ${json.orderId}).`;
     } else {
       elResultadoCopia.className = "copiar-resultado resultado error";
-      elResultadoCopia.textContent = `No se pudo copiar: ${json.reason}`;
+      elResultadoCopia.textContent = `Couldn't copy it: ${json.reason}`;
     }
   } catch (err) {
     elResultadoCopia.hidden = false;
     elResultadoCopia.className = "copiar-resultado resultado error";
-    elResultadoCopia.textContent = "No se pudo conectar con el servidor.";
+    elResultadoCopia.textContent = "Couldn't connect to the server.";
   } finally {
     boton.disabled = false;
     cargarDashboard();

@@ -21,7 +21,7 @@ app.get("/api/dashboard", async (_req, res) => {
     const data = await getDashboard(MARKET);
     res.json({ ok: true, data });
   } catch (err) {
-    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Error desconocido" });
+    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Unknown error" });
   }
 });
 
@@ -30,13 +30,13 @@ app.post("/api/order", async (req, res) => {
   const { side, size } = req.body ?? {};
 
   if (side !== "buy" && side !== "sell") {
-    res.status(400).json({ ok: false, reason: "Elige comprar o vender" });
+    res.status(400).json({ ok: false, reason: "Choose buy or sell" });
     return;
   }
 
   const sizeHuman = Number(size);
   if (!Number.isFinite(sizeHuman) || sizeHuman <= 0) {
-    res.status(400).json({ ok: false, reason: "El tamaño debe ser un número mayor que 0" });
+    res.status(400).json({ ok: false, reason: "Size must be a number greater than 0" });
     return;
   }
 
@@ -50,7 +50,7 @@ app.post("/api/order", async (req, res) => {
     });
     res.json(result);
   } catch (err) {
-    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Error desconocido" });
+    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Unknown error" });
   }
 });
 
@@ -71,7 +71,7 @@ app.post("/api/signals", async (req, res) => {
     }
     res.json(result);
   } catch (err) {
-    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Error desconocido" });
+    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Unknown error" });
   }
 });
 
@@ -80,7 +80,7 @@ app.get("/api/signals", async (_req, res) => {
     const signals = await listarSenales();
     res.json({ ok: true, signals });
   } catch (err) {
-    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Error desconocido" });
+    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Unknown error" });
   }
 });
 
@@ -89,16 +89,16 @@ app.get("/api/signals/:id/candles", async (req, res) => {
   try {
     const data = await obtenerVelasParaSenal(req.params.id);
     if (!data) {
-      res.status(404).json({ ok: false, reason: "Señal no encontrada" });
+      res.status(404).json({ ok: false, reason: "Signal not found" });
       return;
     }
     res.json({ ok: true, ...data });
   } catch (err) {
-    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Error desconocido" });
+    res.status(500).json({ ok: false, reason: err instanceof Error ? err.message : "Unknown error" });
   }
 });
 
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

@@ -34,18 +34,18 @@ export async function placeMarketOrder(params: {
   const { marketName, isBuy, sizeHuman, builderAddr, builderFeeBps } = params;
 
   if (!Number.isFinite(sizeHuman) || sizeHuman <= 0) {
-    return { ok: false, reason: "El tamaño debe ser un número mayor que 0" };
+    return { ok: false, reason: "Size must be a number greater than 0" };
   }
 
   const markets = await read.markets.getAll();
   const market = markets.find((m) => m.market_name === marketName);
   if (!market) {
-    return { ok: false, reason: `No existe el mercado ${marketName}` };
+    return { ok: false, reason: `Market ${marketName} doesn't exist` };
   }
 
   const [priceData] = await read.marketPrices.getByName({ marketName });
   if (!priceData) {
-    return { ok: false, reason: "No se pudo leer el precio en vivo" };
+    return { ok: false, reason: "Couldn't read the live price" };
   }
 
   // Makes sure the subaccount is configured for this market. It's needed
@@ -98,11 +98,11 @@ export async function placeMarketOrder(params: {
     if (!result.orderId) {
       return {
         ok: false,
-        reason: "La orden no se ejecutó (probablemente fondos insuficientes)",
+        reason: "The order didn't execute (probably insufficient funds)",
       };
     }
     return { ok: true, orderId: result.orderId, transactionHash: result.transactionHash };
   } catch (err) {
-    return { ok: false, reason: err instanceof Error ? err.message : "Error desconocido" };
+    return { ok: false, reason: err instanceof Error ? err.message : "Unknown error" };
   }
 }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BTC facil</title>
+<title>Easy BTC</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,58 +12,58 @@
   <h1>Bitcoin</h1>
 
   <div class="precio">
-    <span id="precio">cargando...</span>
+    <span id="precio">loading...</span>
   </div>
 
   <div class="balance">
-    Tienes <strong id="balance">...</strong> disponibles
+    You have <strong id="balance">...</strong> available
   </div>
 
   <div class="lado">
-    <button id="btn-subir" class="lado-btn subir" type="button">Creo que va a SUBIR</button>
-    <button id="btn-bajar" class="lado-btn bajar" type="button">Creo que va a BAJAR</button>
+    <button id="btn-subir" class="lado-btn subir" type="button">I think it'll go UP</button>
+    <button id="btn-bajar" class="lado-btn bajar" type="button">I think it'll go DOWN</button>
   </div>
 
-  <label class="tamano-label" for="tamano">¿Cuánto BTC quieres apostar?</label>
+  <label class="tamano-label" for="tamano">How much BTC do you want to bet?</label>
   <input id="tamano" type="number" min="0" step="0.001" placeholder="0.001" />
   <div id="tamano-usd" class="tamano-usd"></div>
 
-  <button id="btn-enviar" class="enviar" type="button" disabled>Elige subir o bajar primero</button>
+  <button id="btn-enviar" class="enviar" type="button" disabled>Choose up or down first</button>
 
   <div id="resultado" class="resultado" hidden></div>
 
   <section class="posiciones">
-    <h2>Tus posiciones abiertas</h2>
-    <div id="posiciones">ninguna</div>
+    <h2>Your open positions</h2>
+    <div id="posiciones">none</div>
   </section>
 </main>
 
 <main class="card">
-  <h1>Publicar una señal</h1>
-  <p class="subtitulo">Comparte una idea de trade para que otros la copien con un clic.</p>
+  <h1>Publish a signal</h1>
+  <p class="subtitulo">Share a trade idea for others to copy with one click.</p>
 
   <div class="lado">
-    <button id="senal-btn-subir" class="lado-btn subir" type="button">Long (creo que sube)</button>
-    <button id="senal-btn-bajar" class="lado-btn bajar" type="button">Short (creo que baja)</button>
+    <button id="senal-btn-subir" class="lado-btn subir" type="button">Long (I think it goes up)</button>
+    <button id="senal-btn-bajar" class="lado-btn bajar" type="button">Short (I think it goes down)</button>
   </div>
 
-  <label class="tamano-label" for="senal-tp">Take profit (% arriba de la entrada)</label>
+  <label class="tamano-label" for="senal-tp">Take profit (% above entry)</label>
   <input id="senal-tp" type="number" min="0" step="0.1" placeholder="3" />
 
-  <label class="tamano-label" for="senal-sl">Stop loss (% abajo de la entrada)</label>
+  <label class="tamano-label" for="senal-sl">Stop loss (% below entry)</label>
   <input id="senal-sl" type="number" min="0" step="0.1" placeholder="2" />
 
-  <label class="tamano-label" for="senal-horas">¿Cuántas horas la vas a dejar abierta?</label>
+  <label class="tamano-label" for="senal-horas">How many hours will you leave it open?</label>
   <input id="senal-horas" type="number" min="0" step="1" placeholder="4" />
 
-  <button id="senal-btn-publicar" class="enviar" type="button" disabled>Elige Long o Short primero</button>
+  <button id="senal-btn-publicar" class="enviar" type="button" disabled>Choose Long or Short first</button>
 
   <div id="senal-resultado" class="resultado" hidden></div>
 </main>
 
 <main class="card">
-  <h1>Historial de señales</h1>
-  <div id="lista-senales">Cargando...</div>
+  <h1>Signal history</h1>
+  <div id="lista-senales">Loading...</div>
 </main>
 
 <script src="app.js"></script>
