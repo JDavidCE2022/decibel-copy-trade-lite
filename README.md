@@ -1,5 +1,7 @@
 # Decibel Copy-Trade Lite
 
+## Video: https://youtu.be/cG1dFIz2pu4
+
 A dead-simple BTC trading screen on Decibel (Aptos testnet), plus a copy-trade
 layer: publish a signal (Long/Short, TP%, SL%, hold time), see it charted
 against live price, and let anyone copy it with one click.
